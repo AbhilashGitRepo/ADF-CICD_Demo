@@ -1,0 +1,11 @@
+{
+	"name": "SV_training_ADLS_G2_linkService",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://trn1adls1gen2storage.dfs.core.windows.net"
+		}
+	}
+}

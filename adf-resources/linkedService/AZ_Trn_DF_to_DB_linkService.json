@@ -1,0 +1,14 @@
+{
+	"name": "AZ_Trn_DF_to_DB_linkService",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureDatabricks",
+		"typeProperties": {
+			"domain": "https://adb-6344568242703238.18.azuredatabricks.net",
+			"authentication": "MSI",
+			"workspaceResourceId": "/subscriptions/8085115e-2321-4323-bb6e-5f45d869d738/resourceGroups/AZ_Trn_ResourceGroup/providers/Microsoft.Databricks/workspaces/AZ-Trn-Free-WorkSpace",
+			"existingClusterId": "0429-215422-faxes442"
+		}
+	}
+}

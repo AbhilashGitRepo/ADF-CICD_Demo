@@ -1,0 +1,9 @@
+{
+	"name": "AZ-Trn-ADFactory-1",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "3b877bf4-54b3-4570-b3b5-3462a439d9a8",
+		"tenantId": "4008c079-45a2-4a58-b2c3-35c9cd94694d"
+	}
+}

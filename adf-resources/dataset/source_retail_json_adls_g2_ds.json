@@ -1,0 +1,41 @@
+{
+	"name": "source_retail_json_adls_g2_ds",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sv_practice_ADLS_G2_linkService",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"file_sys": {
+				"type": "string"
+			},
+			"file_path": {
+				"type": "string"
+			},
+			"file_name": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": {
+					"value": "@dataset().file_name",
+					"type": "Expression"
+				},
+				"folderPath": {
+					"value": "@dataset().file_path",
+					"type": "Expression"
+				},
+				"fileSystem": {
+					"value": "@dataset().file_sys",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
