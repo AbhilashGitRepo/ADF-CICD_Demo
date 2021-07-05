@@ -1,0 +1,25 @@
+{
+	"name": "customer_dataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "sv_practice_ADLS_G2_linkService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "customers_some_data.csv",
+				"folderPath": "dev/retail_data_json/customers/",
+				"fileSystem": "practice"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

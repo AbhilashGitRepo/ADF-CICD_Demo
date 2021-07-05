@@ -1,0 +1,12 @@
+{
+	"name": "sv_training_ALDS_G2_linkservice",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://training1storage1gen2.dfs.core.windows.net",
+			"encryptedCredential": "ew0KICAiVmVyc2lvbiI6ICIyMDE3LTExLTMwIiwNCiAgIlByb3RlY3Rpb25Nb2RlIjogIktleSIsDQogICJTZWNyZXRDb250ZW50VHlwZSI6ICJQbGFpbnRleHQiLA0KICAiQ3JlZGVudGlhbElkIjogIkFaLVRSTi1BREZBQ1RPUlktMV8xZmYzNDg2Yy1kNWU3LTRiODMtYWI1Zi05ZTRjZWQyYTczMTIiDQp9"
+		}
+	}
+}
