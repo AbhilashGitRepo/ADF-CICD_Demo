@@ -1,0 +1,697 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "AZ-Trn-ADFactory-1"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/CICDDemo')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 20
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/copy_lake1_to_lake2_pipe')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "DelimitedTextSource",
+								"storeSettings": {
+									"type": "AzureBlobFSReadSettings",
+									"recursive": true,
+									"wildcardFolderPath": "dev/retail_data_json/*",
+									"wildcardFileName": "cust*",
+									"enablePartitionDiscovery": false
+								},
+								"formatSettings": {
+									"type": "DelimitedTextReadSettings"
+								}
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "parameterized_csv_dataset",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_sys_name": {
+										"value": "@{pipeline().parameters.src_file_sys_name}",
+										"type": "Expression"
+									},
+									"file_path": {
+										"value": "@{pipeline().parameters.src_file_path}",
+										"type": "Expression"
+									},
+									"file_name": {
+										"value": "@{pipeline().parameters.src_file_name}",
+										"type": "Expression"
+									},
+									"delimiter": {
+										"value": "@pipeline().parameters.src_delimiter",
+										"type": "Expression"
+									}
+								}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "target_csv_cust_dataset",
+								"type": "DatasetReference",
+								"parameters": {
+									"file_sys_name": {
+										"value": "@pipeline().parameters.trgt_file_sys_name",
+										"type": "Expression"
+									},
+									"file_name": {
+										"value": "@pipeline().parameters.trgt_file_name",
+										"type": "Expression"
+									},
+									"file_path": {
+										"value": "@pipeline().parameters.trgt_file_path",
+										"type": "Expression"
+									}
+								}
+							}
+						]
+					}
+				],
+				"parameters": {
+					"src_file_name": {
+						"type": "string"
+					},
+					"trgt_file_name": {
+						"type": "string"
+					},
+					"src_file_path": {
+						"type": "string"
+					},
+					"trgt_file_path": {
+						"type": "string"
+					},
+					"src_file_sys_name": {
+						"type": "string"
+					},
+					"trgt_file_sys_name": {
+						"type": "string"
+					},
+					"src_delimiter": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-06-22T05:58:13Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/parameterized_csv_dataset')]",
+				"[concat(variables('factoryId'), '/datasets/target_csv_cust_dataset')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/test_pipeline1')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "execute_1_nb_activity",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test-bricks",
+							"baseParameters": {
+								"datafactory_name": "AZ-Trn-ADFactory-1"
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AZ_Trn_DF_to_DB_linkService",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"annotations": [
+					"tast_1_pipe"
+				],
+				"lastPublishTime": "2021-05-01T04:09:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AZ_Trn_DF_to_DB_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/test_pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "execute_1_nb_activity",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test-bricks",
+							"baseParameters": {
+								"datafactory_name": {
+									"value": "@pipeline().parameters.adf_pipe_name",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AZ_Trn_DF_to_DB_linkService",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"parameters": {
+					"adf_pipe_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [
+					"tast_1_pipe"
+				],
+				"lastPublishTime": "2021-05-01T04:09:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AZ_Trn_DF_to_DB_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/test_pipeline3_runUrl')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "execute_1_nb_activity",
+						"type": "DatabricksNotebook",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.00:30:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test-2-exec"
+						},
+						"linkedServiceName": {
+							"referenceName": "AZ_Trn_DF_to_DB_linkService",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "copy_run_url",
+						"type": "DatabricksNotebook",
+						"dependsOn": [
+							{
+								"activity": "execute_1_nb_activity",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"notebookPath": "/test-2-runPageUrl",
+							"baseParameters": {
+								"run_url_is": {
+									"value": "@{activity('execute_1_nb_activity').output}",
+									"type": "Expression"
+								}
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "AZ_Trn_DF_to_DB_linkService",
+							"type": "LinkedServiceReference"
+						}
+					},
+					{
+						"name": "Wait1",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "execute_1_nb_activity",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					},
+					{
+						"name": "If Condition run output greater",
+						"type": "IfCondition",
+						"dependsOn": [
+							{
+								"activity": "copy_run_url",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"expression": {
+								"value": "@greater(activity('copy_run_url').output.runOutput.rowsInserted, 30)",
+								"type": "Expression"
+							}
+						}
+					},
+					{
+						"name": "WaitFor_10Sec",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "If Condition run output greater",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 10
+						}
+					},
+					{
+						"name": "WaitFor_5sec",
+						"type": "Wait",
+						"dependsOn": [
+							{
+								"activity": "If Condition run output greater",
+								"dependencyConditions": [
+									"Failed"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"waitTimeInSeconds": 5
+						}
+					}
+				],
+				"annotations": [
+					"tast_1_pipe"
+				],
+				"lastPublishTime": "2021-05-01T21:38:10Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AZ_Trn_DF_to_DB_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/customer_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_practice_ADLS_G2_linkService",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "customers_some_data.csv",
+						"folderPath": "dev/retail_data_json/customers/",
+						"fileSystem": "practice"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_practice_ADLS_G2_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/parameterized_csv_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_practice_ADLS_G2_linkService",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_sys_name": {
+						"type": "string"
+					},
+					"file_path": {
+						"type": "string"
+					},
+					"file_name": {
+						"type": "string"
+					},
+					"delimiter": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().file_sys_name",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": {
+						"value": "@dataset().delimiter",
+						"type": "Expression"
+					},
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_practice_ADLS_G2_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/source_retail_json_adls_g2_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_practice_ADLS_G2_linkService",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_sys": {
+						"type": "string"
+					},
+					"file_path": {
+						"type": "string"
+					},
+					"file_name": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().file_sys",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_practice_ADLS_G2_linkService')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/target_csv_cust_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_training_ALDS_G2_linkservice",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_sys_name": {
+						"type": "string"
+					},
+					"file_name": {
+						"type": "string"
+					},
+					"file_path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().file_sys_name",
+							"type": "Expression"
+						}
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_training_ALDS_G2_linkservice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/target_customer_dataset')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_training_ALDS_G2_linkservice",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "dev2",
+						"fileSystem": "training"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_training_ALDS_G2_linkservice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/target_retail_json_ds')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "sv_training_ALDS_G2_linkservice",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"file_sys": {
+						"type": "string"
+					},
+					"file_name": {
+						"type": "string"
+					},
+					"file_path": {
+						"type": "string"
+					}
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": {
+							"value": "@dataset().file_name",
+							"type": "Expression"
+						},
+						"folderPath": {
+							"value": "@dataset().file_path",
+							"type": "Expression"
+						},
+						"fileSystem": {
+							"value": "@dataset().file_sys",
+							"type": "Expression"
+						}
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/sv_training_ALDS_G2_linkservice')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AZ_Trn_DF_to_DB_linkService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureDatabricks",
+				"typeProperties": {
+					"domain": "https://adb-6344568242703238.18.azuredatabricks.net",
+					"authentication": "MSI",
+					"workspaceResourceId": "/subscriptions/8085115e-2321-4323-bb6e-5f45d869d738/resourceGroups/AZ_Trn_ResourceGroup/providers/Microsoft.Databricks/workspaces/AZ-Trn-Free-WorkSpace",
+					"existingClusterId": "0429-215422-faxes442"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SV_training_ADLS_G2_linkService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "https://trn1adls1gen2storage.dfs.core.windows.net"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sv_practice_ADLS_G2_linkService')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "https://prac1storage1gen2.dfs.core.windows.net",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "**********"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/sv_training_ALDS_G2_linkservice')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "https://training1storage1gen2.dfs.core.windows.net",
+					"accountKey": {
+						"type": "SecureString",
+						"value": "**********"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

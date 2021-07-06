@@ -1,0 +1,33 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "AZ-Trn-ADFactory-1"
+		},
+		"sv_practice_ADLS_G2_linkService_accountKey": {
+			"value": ""
+		},
+		"sv_training_ALDS_G2_linkservice_accountKey": {
+			"value": ""
+		},
+		"ADLS_properties_typeProperties_url": {
+			"value": "https://perlovskybugbash.dfs.core.windows.net"
+		},
+		"AKV_properties_typeProperties_baseUrl": {
+			"value": "https://daperlov-dev.vault.azure.net/"
+		},
+		"SQLDB_properties_typeProperties_connectionString_secretName": {
+			"value": "sqldbconnection"
+		},
+		"SV_training_ADLS_G2_linkService_properties_typeProperties_url": {
+			"value": "https://trn1adls1gen2storage.dfs.core.windows.net"
+		},
+		"sv_practice_ADLS_G2_linkService_properties_typeProperties_url": {
+			"value": "https://prac1storage1gen2.dfs.core.windows.net"
+		},
+		"sv_training_ALDS_G2_linkservice_properties_typeProperties_url": {
+			"value": "https://training1storage1gen2.dfs.core.windows.net"
+		}
+	}
+}
