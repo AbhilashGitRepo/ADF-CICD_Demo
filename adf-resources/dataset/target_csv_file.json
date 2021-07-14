@@ -1,0 +1,20 @@
+{
+	"name": "target_csv_file",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HCA_Demo_Linked_service_2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
