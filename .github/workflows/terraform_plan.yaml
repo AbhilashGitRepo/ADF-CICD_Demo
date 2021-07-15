@@ -16,7 +16,7 @@ jobs:
         cli_config_credentials_hostname: app.terraform.io
         cli_config_credentials_token: ${{ secrets.tf_token }}
         terraform_version: 0.12.0
-        ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+        ACTIONS_ALLOW_UNSECURE_COMMANDS: TRUE
       
     - name: Terraform fmt
       id: fmt
