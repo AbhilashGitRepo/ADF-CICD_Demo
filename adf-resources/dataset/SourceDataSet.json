@@ -1,0 +1,23 @@
+{
+	"name": "SourceDataSet",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "HCA_Demo_Linked_Service_1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "cust.csv",
+				"folderPath": "dev/csv_data",
+				"fileSystem": "practice"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"quoteChar": "\""
+		},
+		"schema": []
+	}
+}
