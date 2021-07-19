@@ -1,8 +1,9 @@
 name: Terraform Plan
 on:
   push:
-    branches: main 
+    branches: [ CICD_Demo_Branch ]
     paths: infraCode/terraform/**
+   
     
 jobs:
 
